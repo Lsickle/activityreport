@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Revalia&display=swap" rel="stylesheet"> 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Styles -->
-    <link rel="stylesheet" href="../css/app.css">
+    <link rel="stylesheet" href="{{asset('css/app.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" />
 </head>
 
@@ -257,7 +257,7 @@
     </div>
 
     </div>
-    <script src="../js/app.js"></script>
+    <script src="{{asset('js/app.js')}}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous"></script>
     <script>
     $(document).ready( function() {
