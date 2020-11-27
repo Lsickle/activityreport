@@ -24,10 +24,20 @@
             <div class="sticky-top">
                 <div class="row bg-light">
                     <div class="col">
-                        <p class="float-left text-secondary text-uppercase font-inter-700" style="font-size:13px;">{{'Activities List'}}</p>
+                        <p class="float-left text-secondary text-uppercase font-inter-700" style="font-size:13px;">{{'Activities List'}} <a href="{{route('home')}}"> <i class="fas fa-home"></i></a> </p>
                     </div>
                     <div class="col">
-                        <a class="float-right font-inter-700 text-secondary" href="#">{{ Auth::user()->name}}</a>
+                        <p class="float-right font-inter-700 text-secondary" href="#">{{ Auth::user()->name}}
+                            <a href="{{ url('/logout') }}" id="logout" onclick="event.preventDefault();
+                                                                        document.getElementById('logout-form').submit();" title="Logout">
+                                <i class="fas fa-sign-out-alt text-danger"></i>
+                            </a>
+                            
+                            <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                                <input type="submit" value="logout" style="display: none;">
+                            </form>
+                        </p>
                     </div>
                 </div>
                 <div class="row bg-light mb-2">
@@ -159,7 +169,7 @@
                                             </a>
                                         </td>
                                         <td class="align-middle" scope="col">
-                                        <button type="button" class="btn btn-primary timemodalbutton" data-toggle="modal" data-target="#exampleModal2" data-id="{{$activity->id}}"><i class="fas fa-clock"></i> New Time</button>
+                                            <button onclick="pasarid({{$activity->id}})" type="button" class="btn btn-primary timemodalbutton" data-toggle="modal" data-target="#exampleModal2" data-id="{{$activity->id}}"><i class="fas fa-clock"></i> New Time</button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -184,7 +194,7 @@
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form class="form-horizontal well" data-async data-target="#exampleModal" action="{{route('activities.store')}}" method="POST">
+                <form id="actForm" class="form-horizontal well" data-async data-target="#exampleModal" action="{{route('activities.store')}}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
@@ -197,7 +207,7 @@
                     </div>
                     <div class="modal-footer">
                         {{-- <button type="submit" class="btn btn-primary">Save</button> --}}
-                        <button id="submitButton" type="submit" value="Save" name="save" class="btn btn-primary">Save</button>
+                        <button form="actForm" id="submitButton" type="submit" value="Save" name="save" class="btn btn-primary">Save</button>
                     </div>
                 </form>
             </div>
@@ -212,7 +222,7 @@
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form class="form-horizontal well" data-async data-target="#exampleModal" action="{{route('times.store')}}" method="POST">
+                <form id="timeform" class="form-horizontal well" data-async data-target="#exampleModal" action="{{route('times.store')}}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
@@ -227,7 +237,7 @@
                             <div class="input-group">
                                 <input name="time" id="time" type="number" max="8" min="1" class="form-control" placeholder="Hours" aria-label="Hours" aria-describedby="basic-addon1">
                                 <span class="invalid-feedback" role="alert">
-                                    <strong id="errorMessage"></strong>
+                                    <strong id="errorMessage2"></strong>
                                 </span>
                             </div>
                         </div>
@@ -235,7 +245,7 @@
                     </div>
                     <div class="modal-footer">
                         {{-- <button type="submit" class="btn btn-primary">Save</button> --}}
-                        <button id="submitButton2" type="submit" value="Save" name="save" class="btn btn-primary">Save</button>
+                        <button form="timeform" id="submitButton2" type="submit" value="Save" name="save" class="btn btn-primary">Save</button>
                     </div>
                 </form>
             </div>
@@ -246,7 +256,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous"></script>
     <script>
     $(document).ready( function() {
-        $('.modal form').on('submit', function(e) {
+        $('#exampleModal form').on('submit', function(e) {
             e.preventDefault();
 			$.ajaxSetup({
 			  headers: {
@@ -341,12 +351,11 @@
 				complete: function(){
 					//
 				}
-            })
-            
-        })
+            });
+        });
     });
     $(document).ready( function() {
-        $('.modaltime form').on('submit', function(e) {
+        $('#exampleModal2 form').on('submit', function(e) {
             e.preventDefault();
 			$.ajaxSetup({
 			  headers: {
@@ -358,10 +367,12 @@
 				method: 'POST',
 				data:{
                     "_token": "{{ csrf_token() }}",
-                    "description": $('input[name=description]').val()
+                    "date": $('input[name=date]').val(),
+                    "time": $('input[name=time]').val(),
+                    "id": $('#actid').val()
                 },
 				beforeSend: function(){
-					let buttonsubmit = $('#submitButton');
+					let buttonsubmit = $('#submitButton2');
                     buttonsubmit.on('click', function(event) {
                         event.preventDefault();
                     });
@@ -371,9 +382,9 @@
 					buttonsubmit.append(`<i class="fas fa-sync fa-spin"></i> Sending...`);
 				},
 				success: function(response){
-					let buttonsubmit = $('#submitButton');
-					let errormessage = $('#errorMessage');
-					let input = $('#description');
+					let buttonsubmit = $('#submitButton2');
+					let errormessage = $('#errorMessage2');
+					let input = $('#time');
                     
                     buttonsubmit.unbind("click");
                     buttonsubmit.disabled = false;
@@ -384,46 +395,13 @@
                     input.prop('class', 'form-control');
                     errormessage.empty();
 
-                    let newRow = $('tbody');
-                    newRow.append(`
-                    <tr>
-                        <th class="align-middle" scope="row"><i class="far fa-check-square"></i></th>
-                        <td class="align-middle" scope="col">
-                            <div class="text-nowrap">
-                                `+response['created_at']+`
-                                <br>
-                                <span class="badge badge-pill badge-local">
-                                • Local
-                                </span>
-                            </div>
-                        </td>
-                        <td class="align-middle" scope="col">
-                            <div class="text-nowrap">
-                                <div class="text-dark">`+response['description']+`</div>
-                                Project
-                            </div>
-                        </td>
-                        <td class="align-middle" scope="col">
-                            <div class="text-nowrap">
-                                <div class="text-dark">1200,5</div>
-                                Hours
-                            </div>
-                        </td>
-                        <td class="align-middle" scope="col">
-                        <a href="/activities/`+response['id']+`" class="btn btn-sm btn-info text-white">
-                                <div class="text-nowrap">Show</div>
-                            </a>
-                        </td>
-                    </tr>
-                    `);
-
-
+                    
                     toastr.success('saved');
 				},
 				error: function(error){
-					let buttonsubmit = $('#submitButton');
-					let errormessage = $('#errorMessage');
-					let input = $('#description');
+					let buttonsubmit = $('#submitButton2');
+					let errormessage = $('#errorMessage2');
+					let input = $('#time');
                     
                     buttonsubmit.unbind("click");
                     buttonsubmit.disabled = false;
@@ -436,22 +414,20 @@
 
                     errormessage.append(error['responseJSON']['error']);
 
-					toastr.error('error');
+					toastr.error(error['responseJSON']['error']);
 				},
 				complete: function(){
 					//
 				}
-            })
-            
-        })
+            });
+        });
     });
-    $(document).on("click", ".timemodalbutton", function () {
-        var id = $(this).data('id');
+        
+    function pasarid(id) {
         $(".modal-body #actid").val( id );
-            // As pointed out in comments, 
-            // it is unnecessary to have to manually call the modal.
-            // $('#addBookDialog').modal('show');
-    });
+        
+        $('#addBookDialog').modal('show');
+    }
     </script>
     <script type="text/javascript">
         toastr.options = {

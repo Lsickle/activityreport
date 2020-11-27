@@ -154,7 +154,7 @@
                                         <br>
                                         <div>
                                             {{-- <input id="submitButton" type="submit" value="Save" class="btn btn-block btn-success text-white font-inter-600" style="font-size:12px;"/> --}}
-                                            <button type="button" class="btn btn-block btn-success text-white font-inter-600" style="font-size:12px;" data-toggle="modal" data-target="#exampleModal" data-whatever="">New Time</button>
+                                            {{-- <button type="button" class="btn btn-block btn-success text-white font-inter-600" style="font-size:12px;" data-toggle="modal" data-target="#exampleModal" data-whatever="">New Time</button> --}}
                                         </div>
                                     </div>
                                 </div>

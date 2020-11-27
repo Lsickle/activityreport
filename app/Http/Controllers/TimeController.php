@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Time;
+use App\Activity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class TimeController extends Controller
 {
@@ -36,26 +39,41 @@ class TimeController extends Controller
     public function store(Request $request)
     {
         if ($request->ajax()) {
-            $activity = Activity::with('times')->where('id', $request->activity)->first();
+            $activity = Activity::with('times')->where('id', $request->id)->first();
 
-            $this->authorize('update', $activity);
+            // return response()->json($activity->times('time')->sum('time'));
 
-            return response()->json($activity);
+            if (Auth::id() !== $activity->user_id) {
+                return response()->json([
+                    'error' => 'the user can edit this activity',
+                    'code' => 401
+                ], 401);
+            }
 
-            // if ($request->time) {
-            //     $time = new Time;
-            //     $time->date =  $request->date;
-            //     $time->time =  $request->time;
-            //     $time->activity_id = $activity->id;
-            //     $time->save();
+            if ($request->time) {
+                if(($activity->times('time')->sum('time') + $request->time) <= 8){
+                    $time = new Time;
+                    $time->date =  $request->date;
+                    $time->time =  $request->time;
+                    $time->activity_id = $activity->id;
+                    $time->save();
 
-			//     return response()->json($activity);
-            // }else{
-            //     return response()->json([
-            //         'error' => 'the description text can not be empty',
-            //         'code' => 401
-            //     ], 401);
-            // }
+                    return response()->json([
+                        'message' => 'time saved',
+                        'code' => 200
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'error' => 'total hours exceed the 8 hours limit',
+                        'code' => 401
+                    ], 401);
+                }
+            }else{
+                return response()->json([
+                    'error' => 'the description text can not be empty',
+                    'code' => 401
+                ], 401);
+            }
 		}
     }
 
